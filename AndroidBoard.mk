@@ -1,24 +1,5 @@
 LOCAL_PATH := $(call my-dir)
 
-#----------------------------------------------------------------------
-# Compile (L)ittle (K)ernel bootloader and the nandwrite utility
-#----------------------------------------------------------------------
-ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)
-
-# Compile
-include bootable/bootloader/edk2/AndroidBoot.mk
-
-$(INSTALLED_BOOTLOADER_MODULE): $(TARGET_EMMC_BOOTLOADER) | $(ACP)
-	$(transform-prebuilt-to-target)
-$(BUILT_TARGET_FILES_PACKAGE): $(INSTALLED_BOOTLOADER_MODULE)
-
-droidcore: $(INSTALLED_BOOTLOADER_MODULE)
-endif
-
-ifeq ($(TARGET_KERNEL_SOURCE),)
-     TARGET_KERNEL_SOURCE := kernel
-endif
-
 DTC := $(HOST_OUT_EXECUTABLES)/dtc$(HOST_EXECUTABLE_SUFFIX)
 UFDT_APPLY_OVERLAY := $(HOST_OUT_EXECUTABLES)/ufdt_apply_overlay$(HOST_EXECUTABLE_SUFFIX)
 
@@ -68,16 +49,6 @@ LOCAL_SRC_FILES    := $(LOCAL_MODULE)
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_EXECUTABLES)
 include $(BUILD_PREBUILT)
 
-
-ifeq ($(strip $(BOARD_DYNAMIC_PARTITION_ENABLE)),true)
-include $(CLEAR_VARS)
-LOCAL_MODULE       := fstab.qcom
-LOCAL_MODULE_TAGS  := optional
-LOCAL_MODULE_CLASS := ETC
-LOCAL_SRC_FILES    := fstab_dynamic_partition.qcom
-LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)
-include $(BUILD_PREBUILT)
-else
 include $(CLEAR_VARS)
 LOCAL_MODULE       := fstab.qcom
 LOCAL_MODULE_TAGS  := optional
@@ -88,7 +59,6 @@ ifeq ($(ENABLE_VENDOR_IMAGE), true)
 LOCAL_POST_INSTALL_CMD := echo $(VENDOR_FSTAB_ENTRY) >> $(LOCAL_MODULE_PATH)/$(LOCAL_MODULE)
 endif
 include $(BUILD_PREBUILT)
-endif
 
 include device/qcom/vendor-common/MergeConfig.mk
 
