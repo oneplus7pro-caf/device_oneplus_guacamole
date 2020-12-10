@@ -1,3 +1,7 @@
+# Inherit proprietary blobs if present
+$(call inherit-product-if-exists, vendor/oneplus/guacamole/guacamole-vendor.mk)
+$(call inherit-product-if-exists, vendor/oneplus/sm8150-common/sm8150-common-vendor.mk)
+
 DEVICE_PATH := device/oneplus/guacamole
 
 # By default this target is new-launch config, so set the default shipping level to 29 (if not set explictly earlier)
