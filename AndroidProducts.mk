@@ -1,5 +1,7 @@
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/msmnile.mk
+	$(LOCAL_DIR)/guacamole.mk
 
 COMMON_LUNCH_CHOICES := \
-        msmnile-userdebug
+    guacamole-user \
+	guacamole-userdebug \
+	guacamole-eng

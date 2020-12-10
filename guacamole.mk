@@ -1,50 +1,14 @@
-#####Dynamic partition Handling
-####
-#### Turning BOARD_DYNAMIC_PARTITION_ENABLE flag to TRUE will enable dynamic partition/super image creation.
+DEVICE_PATH := device/oneplus/guacamole
 
 # By default this target is new-launch config, so set the default shipping level to 29 (if not set explictly earlier)
 SHIPPING_API_LEVEL := 30
 
-# Enable Dynamic partitions only for Q new launch devices.
-ifeq (true,$(call math_gt_or_eq,$(SHIPPING_API_LEVEL),29))
-  BOARD_DYNAMIC_PARTITION_ENABLE := true
-  PRODUCT_SHIPPING_API_LEVEL := $(SHIPPING_API_LEVEL)
-else ifeq ($(SHIPPING_API_LEVEL),28)
-  BOARD_DYNAMIC_PARTITION_ENABLE := false
-  $(call inherit-product, build/make/target/product/product_launched_with_p.mk)
-endif
-
-ifneq ($(strip $(BOARD_DYNAMIC_PARTITION_ENABLE)),true)
 # Enable chain partition for system, to facilitate system-only OTA in Treble.
 BOARD_AVB_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_SYSTEM_ALGORITHM := SHA256_RSA2048
-BOARD_AVB_SYSTEM_ROLLBACK_INDEX := 0
-BOARD_AVB_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
-else
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
-PRODUCT_PACKAGES += fastbootd
-# Add default implementation of fastboot HAL.
-PRODUCT_PACKAGES += android.hardware.fastboot@1.0-impl-mock
-PRODUCT_COPY_FILES += $(LOCAL_PATH)/fstab_dynamic_partition.qcom:$(TARGET_COPY_OUT_RAMDISK)/fstab.qcom
-BOARD_AVB_VBMETA_SYSTEM := system
-BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
-BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
-$(call inherit-product, build/make/target/product/gsi_keys.mk)
-endif
-
-#####Dynamic partition Handling
 
 # Default A/B configuration.
 ENABLE_AB ?= true
-
-# Enable virtual-ab by default
-ENABLE_VIRTUAL_AB := true
-
-ifeq ($(ENABLE_VIRTUAL_AB), true)
-    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
-endif
 
 # For QSSI builds, we skip building the system image (when value adds are enabled).
 # Instead we build the "non-system" images (that we support).
@@ -54,7 +18,7 @@ PRODUCT_BUILD_SYSTEM_OTHER_IMAGE := false
 PRODUCT_BUILD_VENDOR_IMAGE := true
 PRODUCT_BUILD_PRODUCT_IMAGE := false
 PRODUCT_BUILD_SYSTEM_EXT_IMAGE := false
-PRODUCT_BUILD_ODM_IMAGE := true
+PRODUCT_BUILD_ODM_IMAGE := false
 PRODUCT_BUILD_CACHE_IMAGE := false
 PRODUCT_BUILD_RAMDISK_IMAGE := true
 PRODUCT_BUILD_USERDATA_IMAGE := true
@@ -67,13 +31,15 @@ TARGET_SKIP_OTATOOLS_PACKAGE := true
 
 # Enable AVB 2.0
 BOARD_AVB_ENABLE := true
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 2
 
 PRODUCT_SOONG_NAMESPACES += \
     hardware/google/av \
     hardware/google/interfaces
 
 # privapp-permissions whitelisting (To Fix CTS :privappPermissionsMustBeEnforced)
-PRODUCT_PROPERTY_OVERRIDES += ro.control_privapp_permissions=enforce
+PRODUCT_PROPERTY_OVERRIDES += ro.control_privapp_permissions=log
 
 TARGET_DEFINES_DALVIK_HEAP := true
 TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
@@ -87,11 +53,11 @@ PRODUCT_PROPERTY_OVERRIDES  += \
 	dalvik.vm.heapminfree=512k \
 	dalvik.vm.heapmaxfree=8m
 
-
-PRODUCT_NAME := msmnile
-PRODUCT_DEVICE := msmnile
-PRODUCT_BRAND := qti
-PRODUCT_MODEL := msmnile for arm64
+PRODUCT_NAME := guacamole
+PRODUCT_DEVICE := guacamole
+PRODUCT_BRAND := OnePlus
+PRODUCT_MODEL := OnePlus7Pro
+PRODUCT_MANUFACTURER := OnePlus
 
 #Initial bringup flags
 TARGET_USES_AOSP := false
@@ -268,9 +234,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.ipsec_tunnels.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.ipsec_tunnels.xml \
 
-DEVICE_MANIFEST_FILE := device/qcom/msmnile/manifest.xml
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
 DEVICE_MATRIX_FILE   := device/qcom/common/compatibility_matrix.xml
-DEVICE_FRAMEWORK_MANIFEST_FILE := device/qcom/msmnile/framework_manifest.xml
+DEVICE_FRAMEWORK_MANIFEST_FILE := $(DEVICE_PATH)/framework_manifest.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/qcom/opensource/core-utils/vendor_framework_compatibility_matrix.xml
 
 #audio related module
@@ -281,12 +247,10 @@ PRODUCT_PACKAGES += \
     android.hardware.broadcastradio@1.0-impl
 
 # MSM IRQ Balancer configuration file
-PRODUCT_COPY_FILES += device/qcom/msmnile/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
+PRODUCT_COPY_FILES += $(DEVICE_PATH)/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
 
 # Powerhint configuration file
-PRODUCT_COPY_FILES += device/qcom/msmnile/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
-
-
+PRODUCT_COPY_FILES += $(DEVICE_PATH)/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 
 # Context hub HAL
 PRODUCT_PACKAGES += \
@@ -333,7 +297,7 @@ PRODUCT_VENDOR_MOVE_ENABLED := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 
 ifneq ($(strip $(TARGET_USES_RRO)),true)
-DEVICE_PACKAGE_OVERLAYS += device/qcom/msmnile/overlay
+DEVICE_PACKAGE_OVERLAYS += $(DEVICE_PATH)/overlay
 endif
 
 
@@ -361,9 +325,7 @@ ro.crypto.set_dun = true
 PRODUCT_PROPERTY_OVERRIDES += ro.incremental.enable=1
 
 ifneq ($(GENERIC_ODM_IMAGE),true)
-    ODM_MANIFEST_FILES += device/qcom/msmnile/manifest-qva.xml
-else
-    ODM_MANIFEST_FILES += device/qcom/msmnile/manifest-generic.xml
+    ODM_MANIFEST_FILES += $(DEVICE_PATH)/manifest-qva.xml
 endif
 
 #Enable Light AIDL HAL
