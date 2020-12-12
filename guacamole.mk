@@ -332,6 +332,9 @@ PRODUCT_PACKAGES += android.hardware.lights-service.qti
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.netflix.bsp_rev=Q855-16947-1
 
+# SDClang
+include $(DEVICE_PATH)/sdllvm-lto-defs.mk
+
 ###################################################################################
 # This is the End of target.mk file.
 # Now, Pickup other split product.mk files:
