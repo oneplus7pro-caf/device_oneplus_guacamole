@@ -5,7 +5,10 @@ $(call inherit-product-if-exists, vendor/oneplus/sm8150-common/sm8150-common-ven
 DEVICE_PATH := device/oneplus/guacamole
 
 # By default this target is new-launch config, so set the default shipping level to 29 (if not set explictly earlier)
-SHIPPING_API_LEVEL := 30
+SHIPPING_API_LEVEL := 28
+
+BOARD_DYNAMIC_PARTITION_ENABLE := false
+ $(call inherit-product, build/make/target/product/product_launched_with_p.mk)
 
 # Enable chain partition for system, to facilitate system-only OTA in Treble.
 BOARD_AVB_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
