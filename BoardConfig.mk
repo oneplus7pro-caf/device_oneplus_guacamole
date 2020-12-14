@@ -56,7 +56,6 @@ AB_OTA_PARTITIONS ?= \
 	boot \
 	dtbo \
 	odm \
-	system \
  	vendor \
 	vbmeta
 
