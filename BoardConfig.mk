@@ -61,6 +61,7 @@ AB_OTA_PARTITIONS ?= \
 
 BOARD_USES_METADATA_PARTITION := true
 
+TARGET_OTA_ASSERT_DEVICE := true
 #Enable split vendor image
 ENABLE_VENDOR_IMAGE := true
 ifeq ($(ENABLE_VENDOR_IMAGE), true)
