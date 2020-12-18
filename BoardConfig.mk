@@ -121,6 +121,7 @@ BOARD_VENDOR_KERNEL_MODULES := \
     $(KERNEL_MODULES_OUT)/mpq-adapter.ko \
     $(KERNEL_MODULES_OUT)/mpq-dmx-hw-plugin.ko \
     $(KERNEL_MODULES_OUT)/tspp.ko \
+	$(KERNEL_MODULES_OUT)/rdbg.ko
 
 # install lkdtm only for userdebug and eng build variants
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
