@@ -335,6 +335,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # SDClang
 include $(DEVICE_PATH)/sdllvm-lto-defs.mk
 
+# Wlan
+BOARD_HAS_QCOM_WLAN := true
+WIFI_DRIVER_BUILT := qca_cld3
 ###################################################################################
 # This is the End of target.mk file.
 # Now, Pickup other split product.mk files:
