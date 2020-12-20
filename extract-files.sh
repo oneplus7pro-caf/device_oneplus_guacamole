@@ -41,13 +41,18 @@ venPackArray=()
 
 # Classification and then extraction
 start_extraction() {
+    # Read blobs list line by line
     while read line; do
+        # Null check
         if [ ! -z "$line" ] ; then
+            # Comments
             if [[ $line == *"#"* ]] ; then
                 echo $line
             else
+                # Import blob
                 if [[ $line == -* ]] ; then
                     line=$(echo $line | sed 's/-//')
+                    # Apks, jars, libs
                     if [[ $line == *"apk"* ]] ; then
                         appArray+=($line)
                     elif [[ $line == *"jar"* ]] ; then
@@ -58,21 +63,24 @@ start_extraction() {
                         fi
                     fi
                 else
+                    # Blobs in different input directory
                     if [[ $line == *":"* ]] ; then
                         aline=${line#*:}
                     else
                         aline=$line
                     fi
 
-                    if [[ $aline == *"vendor"* ]] ; then
+                    # Classifying blobs
+                    if [[ $aline == *"vendor/"* ]] ; then
                         write_to_makefiles $aline vendor
-                    elif [[ $aline == *"product"* ]] ; then
+                    elif [[ $aline == *"product/"* ]] ; then
                         write_to_makefiles $aline product
                     else
                         write_to_makefiles $aline system
                     fi
                 fi
-                extract_blob $line $diff
+                # Extract the blob from device
+                extract_blob $line
             fi
         fi
     done < $BLOBS_LIST
@@ -81,17 +89,18 @@ start_extraction() {
 # Extract everything
 extract_blob() {
     path=${1%/*}
+    # Redirect path to blob
     if [[ $1 == *":"* ]] ; then
         path=${1#*:}
         apath=${1%:*}
         path=${path%/*}
         mkdir -p ${BLOBS_PATH}/${path}
         adb pull $apath ${BLOBS_PATH}/${path}
-    elif [[ $1 == *"vendor/"* ]] ; then
+    elif [[ $1 == *"vendor/"* ]] ; then # vendor blobs
         vpath=${path#*/}
         mkdir -p ${BLOBS_PATH}/sm8150/${vpath}
         adb pull $1 ${BLOBS_PATH}/sm8150/${vpath}
-    else
+    else # system blobs
         mkdir -p ${BLOBS_PATH}/${path}
         adb pull $1 ${BLOBS_PATH}/${path}
     fi
