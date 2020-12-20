@@ -210,13 +210,16 @@ write_to_makefiles() {
     partition=${2^^}
     path=${1#*/}
     if [[ $2 = "vendor" ]] ; then
-        echo -ne "\\ \n\tvendor/${VENDOR}/${DEVICE}/sm8150/${path}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $VENDOR_MK
+        echo -ne "\\" >> $VENDOR_MK
+        echo -ne "\n\tvendor/${VENDOR}/${DEVICE}/sm8150/${path}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $VENDOR_MK
     elif [[ $2 = "product" ]] ; then
         path=${1#*product/}
-        echo -ne "\\ \n\tvendor/${VENDOR}/${DEVICE}/${1}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $SYSTEM_MK
+        echo -ne "\\" >> $SYSTEM_MK
+        echo -ne "\n\tvendor/${VENDOR}/${DEVICE}/${1}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $SYSTEM_MK
     else
         path=${1#*system/}
-        echo -ne "\\ \n\tvendor/${VENDOR}/${DEVICE}/${1}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $SYSTEM_MK
+        echo -ne "\\" >> $SYSTEM_MK
+        echo -ne "\n\tvendor/${VENDOR}/${DEVICE}/${1}:\$(TARGET_COPY_OUT_${partition})/${path} " >> $SYSTEM_MK
     fi
 }
 
@@ -227,12 +230,14 @@ write_packages() {
     for package in ${sysPackArray[@]}; do
         package=${package##*/}
         package=${package%.*}
-        echo -ne "\\ \n\t$package " >> $SYSTEM_MK
+        echo -ne "\\" >> $SYSTEM_MK
+        echo -ne "\n\t$package " >> $SYSTEM_MK
     done
     for package in ${venPackArray[@]}; do
         package=${package##*/}
         package=${package%.*}
-        echo -ne "\\ \n\t$package " >> $VENDOR_MK
+        echo -ne "\\" >> $VENDOR_MK
+        echo -ne "\n\t$package " >> $VENDOR_MK
     done
 }
 
