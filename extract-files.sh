@@ -163,9 +163,7 @@ write_lib_bp() {
 write_app_bp() {
     name=${1##*/}
     name=${name%.*}
-    if [[ $1 == *"vendor"* ]] ; then
-        app=${1#*/}
-    fi
+    app=${1#*/}
     echo -e "\nandroid_app_import {
     name: \"$name\",
     owner: \"$VENDOR\",
