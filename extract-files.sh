@@ -194,7 +194,7 @@ write_dex_bp() {
     echo -e "\ndex_import {
     name: \"$name\",
     owner: \"$VENDOR\",
-    jars: \"$jar\"," >> ${BLOBS_PATH}/${2}/Android.bp
+    jars: [\"$jar\"]," >> ${BLOBS_PATH}/${2}/Android.bp
 
     if [[ $1 == *"product/"* ]] ; then
         echo -e "\tproduct_specific: true,\n}" >> ${BLOBS_PATH}/${2}/Android.bp
