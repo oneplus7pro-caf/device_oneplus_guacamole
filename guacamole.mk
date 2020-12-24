@@ -16,6 +16,7 @@ BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag --flags 2
 # Default A/B configuration.
 ENABLE_AB ?= true
 
+TARGET_RELEASETOOLS_EXTENSIONS := device/qcom/common
 # For QSSI builds, we skip building the system image (when value adds are enabled).
 # Instead we build the "non-system" images (that we support).
 
