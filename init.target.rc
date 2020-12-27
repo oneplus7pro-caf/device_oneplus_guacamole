@@ -59,6 +59,9 @@ on fs
     chmod 0666 /dev/audio_ultrasound
     chmod 0666 /dev/sensor_ultrasound
 
+    mount ext4 /dev/block/bootdevice/by-name/op1 /op1 ro barrier=1 discard context=u:object_r:op1_file:s0
+    mount ext4 /dev/block/bootdevice/by-name/op2 /op2 noatime nosuid nodev barrier=1
+    chown system system /op2
     chown system system /sys/module/smartboost_core/parameters/page_cache_reside_switch
     chown system system /sys/module/fsc/parameters/enable
     chmod 0664 /sys/module/fsc/parameters/enable
@@ -66,6 +69,8 @@ on fs
 on post-fs
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
+
+    mkdir /op2/recovery 0770 root system
 
     # make the selinux kernel policy world-readable
     chmod 0444 /sys/fs/selinux/policy
@@ -94,6 +99,10 @@ on early-boot
 # For cpusets initialize for Silver Only first and then Silver + Gold
 # Silver Only configuration cannot work with 0-7
 on boot
+    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0048/tp_fw_update 0
+    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0049/tp_fw_update 0
+    write /sys/devices/platform/soc/c80000.i2c/i2c-4/4-0020/tp_fw_update 0
+    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0020/tp_fw_update 0
     chown system system /sys/kernel/hbtp/display_pwr
     chown system system /sys/kernel/qvr_external_sensor/fd
     start rmt_storage
@@ -109,6 +118,7 @@ on boot
     write /dev/cpuset/foreground/boost/cpus 0-7
     write /dev/cpuset/background/cpus 0-7
     write /dev/cpuset/system-background/cpus 0-7
+    write /dev/cpuset/display/cpus 4-7
 
 # Add a cpuset for the camera daemon
 # We want all cores for camera
@@ -122,11 +132,6 @@ on boot
     #hbm
     chown system system /sys/class/drm/card0-DSI-1/hbm_brightness
     chmod 0644 /sys/class/drm/card0-DSI-1/hbm_brightness
-
-    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0048/tp_fw_update 0
-    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0049/tp_fw_update 0
-    write /sys/devices/platform/soc/c80000.i2c/i2c-4/4-0020/tp_fw_update 0
-    write /sys/devices/platform/soc/c80000.i2c/i2c-5/5-0020/tp_fw_update 0
 
 #USB controller configuration
     setprop vendor.usb.rndis.func.name "gsi"
