@@ -46,7 +46,6 @@ TARGET_KERNEL_APPEND_DTB := false
 #Enable dtb in boot image and Set Header version
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_BOOTIMG_HEADER_VERSION := 2
-
 BOARD_MKBOOTIMG_ARGS := --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
 
 # Defines for enabling A/B builds
@@ -61,7 +60,7 @@ AB_OTA_PARTITIONS ?= \
 
 BOARD_USES_METADATA_PARTITION := true
 
-TARGET_OTA_ASSERT_DEVICE := true
+TARGET_OTA_ASSERT_DEVICE := OnePlus7Pro
 #Enable split vendor image
 ENABLE_VENDOR_IMAGE := true
 ifeq ($(ENABLE_VENDOR_IMAGE), true)
@@ -115,13 +114,13 @@ BOARD_VENDOR_KERNEL_MODULES := \
     $(KERNEL_MODULES_OUT)/audio_wcd_spi.ko \
     $(KERNEL_MODULES_OUT)/audio_native.ko \
     $(KERNEL_MODULES_OUT)/audio_machine_msmnile.ko \
-	$(KERNEL_MODULES_OUT)/audio_tfa9894.ko \
+	  $(KERNEL_MODULES_OUT)/audio_tfa9894.ko \
     $(KERNEL_MODULES_OUT)/wil6210.ko \
     $(KERNEL_MODULES_OUT)/msm_11ad_proxy.ko \
     $(KERNEL_MODULES_OUT)/mpq-adapter.ko \
     $(KERNEL_MODULES_OUT)/mpq-dmx-hw-plugin.ko \
     $(KERNEL_MODULES_OUT)/tspp.ko \
-	$(KERNEL_MODULES_OUT)/rdbg.ko
+	  $(KERNEL_MODULES_OUT)/rdbg.ko
 
 # install lkdtm only for userdebug and eng build variants
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
