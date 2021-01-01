@@ -1,16 +1,20 @@
 DEVICE_PATH := device/oneplus/guacamole
 
+# Enable updating of APEXes
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
 # By default this target is new-launch config, so set the default shipping level to 29 (if not set explictly earlier)
 SHIPPING_API_LEVEL := 28
 
 BOARD_DYNAMIC_PARTITION_ENABLE := false
  $(call inherit-product, build/make/target/product/product_launched_with_p.mk)
 
-# Enable chain partition for system, to facilitate system-only OTA in Treble.
+# Enable AVB
+BOARD_AVB_ENABLE := true
 BOARD_AVB_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_SYSTEM_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_SYSTEM_ROLLBACK_INDEX := 0
-BOARD_AVB_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag --flags 2
 
 # Default A/B configuration.
@@ -35,9 +39,6 @@ PRODUCT_BUILD_USERDATA_IMAGE := true
 # need to build the OTA tools package (we'll use the one from the system build).
 TARGET_SKIP_OTA_PACKAGE := true
 TARGET_SKIP_OTATOOLS_PACKAGE := true
-
-# Enable AVB 2.0
-BOARD_AVB_ENABLE := true
 
 PRODUCT_SOONG_NAMESPACES += \
     hardware/google/av \
@@ -82,6 +83,10 @@ ifeq ($(GENERIC_ODM_IMAGE),true)
 else
   PRODUCT_PROPERTY_OVERRIDES += debug.stagefright.omx_default_rank=0
 endif
+
+# Properties
+TARGET_ODM_PROP += $(DEVICE_PATH)/odm.prop
+TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 
 ###########
 #QMAA flags starts
@@ -206,12 +211,13 @@ PRODUCT_PACKAGES += $(AUDIO_DLKM)
 PRODUCT_PACKAGES += fs_config_files
 
 #A/B related packages
-PRODUCT_PACKAGES += update_engine \
+PRODUCT_PACKAGES += \
+    update_engine \
     update_engine_client \
     update_verifier \
-    android.hardware.boot@1.1-impl-qti \
-    android.hardware.boot@1.1-impl-qti.recovery \
-    android.hardware.boot@1.1-service
+    android.hardware.boot@1.0-impl \
+    android.hardware.boot@1.0-service \
+    bootctrl.msmnile
 
 PRODUCT_HOST_PACKAGES += \
     brillo_update_payload
@@ -300,7 +306,6 @@ ifneq ($(strip $(TARGET_USES_RRO)),true)
 DEVICE_PACKAGE_OVERLAYS += $(DEVICE_PATH)/overlay
 endif
 
-
 #Enable vndk-sp Libraries
 PRODUCT_PACKAGES += vndk_package
 
@@ -316,10 +321,6 @@ include device/qcom/wlan/msmnile/wlan.mk
 TARGET_MOUNT_POINTS_SYMLINKS := false
 
 TARGET_USES_MKE2FS := true
-
-PRODUCT_PROPERTY_OVERRIDES += \
-ro.crypto.volume.filenames_mode = "aes-256-cts" \
-ro.crypto.set_dun = true
 
 # Enable incremental FS feature
 PRODUCT_PROPERTY_OVERRIDES += ro.incremental.enable=1
@@ -346,7 +347,5 @@ $(call inherit-product, vendor/oneplus/guacamole/sm8150/guacamole-vendor.mk)
 # This is the End of target.mk file.
 # Now, Pickup other split product.mk files:
 ###################################################################################
-# TODO: Relocate the system product.mk files pickup into qssi lunch, once it is up.
-$(call inherit-product-if-exists, vendor/qcom/defs/product-defs/system/*.mk)
 $(call inherit-product-if-exists, vendor/qcom/defs/product-defs/vendor/*.mk)
 ###################################################################################
