@@ -13,8 +13,9 @@ TARGET_NO_RECOVERY := true
 BOARD_USES_RECOVERY_AS_BOOT := true
 
 BOARD_SYSTEMSDK_VERSIONS:=$(SHIPPING_API_LEVEL)
-
+BOARD_VENDOR := oneplus
 TARGET_BOARD_PLATFORM := msmnile
+TARGET_BOARD_PLATFORM_GPU := qcom-adreno640
 TARGET_BOOTLOADER_BOARD_NAME := msmnile
 
 TARGET_ARCH := arm64
@@ -30,6 +31,14 @@ TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := generic
 TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a76
+
+TARGET_USES_64_BIT_BINDER := true
+
+#Keymaster
+TARGET_PROVIDES_KEYMASTER := true
+
+# ANT+
+BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
 
 BOARD_SECCOMP_POLICY := $(DEVICE_PATH)/seccomp
 
@@ -55,16 +64,15 @@ AB_OTA_PARTITIONS ?= \
 	boot \
 	dtbo \
 	odm \
- 	vendor \
-	vbmeta
+	vendor
 
 BOARD_USES_METADATA_PARTITION := true
 
-TARGET_OTA_ASSERT_DEVICE := OnePlus7Pro
+TARGET_OTA_ASSERT_DEVICE := guacamole,OnePlus7Pro
 #Enable split vendor image
 ENABLE_VENDOR_IMAGE := true
 ifeq ($(ENABLE_VENDOR_IMAGE), true)
-TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery_vendor_variant.fstab
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/fstab.qcom
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_VENDOR := vendor
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
@@ -114,13 +122,13 @@ BOARD_VENDOR_KERNEL_MODULES := \
     $(KERNEL_MODULES_OUT)/audio_wcd_spi.ko \
     $(KERNEL_MODULES_OUT)/audio_native.ko \
     $(KERNEL_MODULES_OUT)/audio_machine_msmnile.ko \
-	  $(KERNEL_MODULES_OUT)/audio_tfa9894.ko \
+    $(KERNEL_MODULES_OUT)/audio_tfa9894.ko \
     $(KERNEL_MODULES_OUT)/wil6210.ko \
     $(KERNEL_MODULES_OUT)/msm_11ad_proxy.ko \
     $(KERNEL_MODULES_OUT)/mpq-adapter.ko \
     $(KERNEL_MODULES_OUT)/mpq-dmx-hw-plugin.ko \
     $(KERNEL_MODULES_OUT)/tspp.ko \
-	  $(KERNEL_MODULES_OUT)/rdbg.ko
+    $(KERNEL_MODULES_OUT)/rdbg.ko
 
 # install lkdtm only for userdebug and eng build variants
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
@@ -134,7 +142,7 @@ TARGET_USES_ION := true
 TARGET_USES_NEW_ION_API :=true
 TARGET_USES_QCOM_BSP := false
 BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=2048 loop.max_part=7 androidboot.usbcontroller=a600000.dwc3
-BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive androidboot.vbmeta.avb_version=1.0 firmware_class.path=/vendor/firmware_mnt/image
 BOARD_EGL_CFG := $(DEVICE_PATH)/egl.cfg
 
 BOARD_KERNEL_BASE        := 0x00000000
@@ -149,12 +157,14 @@ TARGET_KERNEL_CROSS_COMPILE_ARM32_PREFIX := $(PWD)/prebuilts/gcc/linux-x86/arm/a
 
 TARGET_USES_UNCOMPRESSED_KERNEL := false
 
-
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 
 # Bluetooth
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(DEVICE_PATH)/bluetooth/include
+
+# APEX
+DEXPREOPT_GENERATE_APEX_IMAGE := true
 
 #File system for ODM
 TARGET_COPY_OUT_ODM := odm
@@ -191,8 +201,8 @@ TARGET_USES_GRALLOC1 := true
 # Enable sensor multi HAL
 USE_SENSOR_MULTI_HAL := true
 
-#Do not add non-hlos files to ota packages
-ADD_RADIO_FILES := false
+#Add non-hlos files to ota packages
+ADD_RADIO_FILES := true
 
 #Enable INTERACTION_BOOST
 TARGET_USES_INTERACTION_BOOST := true
@@ -232,8 +242,6 @@ Q_BU_DISABLE_MODULE := true
 # This is the End of BoardConfig.mk file.
 # Now, Pickup other split Board.mk files:
 #################################################################################
-# TODO: Relocate the system Board.mk files pickup into qssi lunch, once it is up.
--include vendor/qcom/defs/board-defs/system/*.mk
 -include vendor/qcom/defs/board-defs/vendor/*.mk
 #################################################################################
 
